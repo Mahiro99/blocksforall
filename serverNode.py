@@ -27,10 +27,23 @@ def mine():
     latest_block = our_blockchain.latest_block()
     last_proof = latest_block['proof']
     proof = our_blockchain.proof_of_work(last_proof)
-    # Calculate the Proof of Work
-    # Reward the miner (us) by adding a transaction granting us 1 coin
+
+    # Reward the miner (us) by adding a transaction granting us 1 coin. Sender is "0" to signify that this node has mined a new coin
+    our_blockchain.add_transaction(sender = 0, receiver = node_ID, mony = 1 )
+
     # Forge the new Block by adding it to the chain
-    return "Mining a new block!"
+    previous_hash = our_blockchain.hasher(latest_block)
+    block = our_blockchain.add_block(proof, previous_hash)
+
+    response  = {
+        "message" : "New block has been created",
+        'index': block['index'],
+        'transactions': block['transactions'],
+        'proof': block['proof'], 
+        'previous_hash': block['previous_hash']
+    }
+
+    return jsonify(response), 200
 
 
 # /transactions/new
@@ -42,10 +55,13 @@ def transactions():
 
     #checking if the required fields were in the posted data
     required_data = ['sender', 'reciever', 'mony']
+    
     #just sees if value elements are == the required elements. If a single value is false, then returns error
     if(not all(k in values for k in required_data)): ## not sure if i understand how the for loop is structured
         return 'Missing Required Data', 400
+
     index = our_blockchain.add_transaction(values['sender'], values['reciever'], values['mony'])
+   
     response = {
         'message': f'Transaction pending for block {index} insertion'
     }
