@@ -22,6 +22,14 @@ our_blockchain = BlockChain()
 # to tell our server to mine a new block.
 @app.route('/mine', methods=['GET'])
 def mine():
+
+    #Retrieving the most current block, and extracting the last proof used. We use that to get the current proof by running POW algorithm
+    latest_block = our_blockchain.latest_block()
+    last_proof = latest_block['proof']
+    proof = our_blockchain.proof_of_work(last_proof)
+    # Calculate the Proof of Work
+    # Reward the miner (us) by adding a transaction granting us 1 coin
+    # Forge the new Block by adding it to the chain
     return "Mining a new block!"
 
 
@@ -29,7 +37,19 @@ def mine():
 # to create a new transaction to a block
 @app.route('/transactions/new', methods=['POST'])
 def transactions():
-    return "Adding a new transaction!"
+
+    values = request.get_json()
+
+    #checking if the required fields were in the posted data
+    required_data = ['sender', 'reciever', 'mony']
+    #just sees if value elements are == the required elements. If a single value is false, then returns error
+    if(not all(k in values for k in required_data)): ## not sure if i understand how the for loop is structured
+        return 'Missing Required Data', 400
+    index = our_blockchain.add_transaction(values['sender'], values['reciever'], values['mony'])
+    response = {
+        'message': f'Transaction pending for block {index} insertion'
+    }
+    return jsonify(response), 201
 
 
 
