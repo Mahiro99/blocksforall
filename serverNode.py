@@ -1,5 +1,5 @@
-from flask import Flask, jsonify, request
 from uuid import uuid4
+from flask import Flask, jsonify, request
 from blockchain import BlockChain
 
 # Makes it easy to map endpoints to Python functions. 
@@ -81,4 +81,3 @@ def chain():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port = 5000)
-
