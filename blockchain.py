@@ -56,7 +56,7 @@ class BlockChain(object):
     # hashes the whole block
 
     @staticmethod
-    def hasher(self, block):
+    def hasher(block):
 
         # converts block to string, and orders the dictionary, or it'll introduce inconsistent hashes
         blockInString = json.dumps(block, sort_keys=True).encode()
@@ -64,13 +64,13 @@ class BlockChain(object):
         # Creates a SHA-256 hash of a Block
         return hashlib.sha256(blockInString).hexdigest()
 
-    def add_transaction(self, sender, receiver, mony):
+    def add_transaction(self, sender, recipient, amount):
 
         self.transactions.append(
             {
                 'sender': sender,
-                'recipient': receiver,
-                'amount': mony,
+                'recipient': recipient,
+                'amount': amount,
             }
         )
 

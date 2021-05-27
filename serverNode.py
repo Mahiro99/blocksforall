@@ -36,18 +36,17 @@ def transactions():
     values = request.get_json()
 
     # checking if the required fields were in the posted data
-    required_data = ['sender', 'reciever', 'mony']
+    required_data = ['sender', 'recipient', 'amount']
 
     # just sees if value elements are == the required elements. If a single value is false, then returns error
     # not sure if i understand how the for loop is structured
-    if(not all(k in values for k in required_data)):
+    if not all(k in values for k in required_data):
         return 'Missing Required Data', 400
 
-    index = our_blockchain.add_transaction(
-        values['sender'], values['reciever'], values['mony'])
+    index = our_blockchain.add_transaction(values['sender'], values['recipient'], values['amount'])
 
     response = {
-        'message': f'Transaction pending for block {index} insertion'
+        'message': f'Transaction pending for insertion in block {index}'
     }
 
     return jsonify(response), 201
@@ -59,12 +58,12 @@ def transactions():
 def mine():
 
     # Retrieving the most current block, and extracting the last proof used. We use that to get the current proof by running PoW algorithm
-    latest_block = our_blockchain.latest_block()
+    latest_block = our_blockchain.latest_block
     last_proof = latest_block['proof']
     proof = our_blockchain.proof_of_work(last_proof)
 
     # Reward the miner (us) by adding a transaction granting us 1 coin. Sender is "0" to signify that this node has mined a new coin
-    our_blockchain.add_transaction(sender=0, receiver=node_ID, mony=1)
+    our_blockchain.add_transaction(sender=0, recipient=node_ID, amount=1)
 
     # Forge the new Block by adding it to the chain
     previous_hash = our_blockchain.hasher(latest_block)
