@@ -16,10 +16,20 @@ node_ID = str(uuid4()).replace('-', '')
 # Instantiating our blockchain
 our_blockchain = BlockChain()
 
-# /chain to return the full Blockchain
+
+@app.route('/nodes/register')
+# accepts a list of new nodes in the form of URLs
+def register_nodes():
+    return "Registered"
+
+@app.route('/nodes/resolve')
+# implement consensus algorithm, which rsolves any conflicts, ensuring a node has the correct chain
+def resolve():
+     return "Resolved"
 
 
 @app.route('/chain', methods=['GET'])
+# /chain to return the full Blockchain
 def chain():
     response = {
         'fullChain': our_blockchain.chain,
@@ -27,10 +37,9 @@ def chain():
     }
     return jsonify(response), 200
 
-# /transactions/new to create a new transaction to a block
-
 
 @app.route('/transactions/new', methods=['POST'])
+# /transactions/new to create a new transaction to a block
 def transactions():
 
     values = request.get_json()
@@ -43,7 +52,8 @@ def transactions():
     if not all(k in values for k in required_data):
         return 'Missing Required Data', 400
 
-    index = our_blockchain.add_transaction(values['sender'], values['recipient'], values['amount'])
+    index = our_blockchain.add_transaction(
+        values['sender'], values['recipient'], values['amount'])
 
     response = {
         'message': f'Transaction pending for insertion in block {index}'
@@ -51,10 +61,9 @@ def transactions():
 
     return jsonify(response), 201
 
-# /mine to tell our server to mine a new block.
-
 
 @app.route('/mine', methods=['GET'])
+# /mine to tell our server to mine a new block.
 def mine():
 
     # Retrieving the most current block, and extracting the last proof used. We use that to get the current proof by running PoW algorithm

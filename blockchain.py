@@ -16,10 +16,18 @@ class BlockChain(object):
         self.add_block(proof=100, previous_hash=1)
 
     # consensus algorithm
+    # --> to make it decentralized, we have to register new nodes and
+    # ensure each node reflects the same chain. To make this work,
+    # each node on the network should keep a registry of other nodes on the network
+    def register_nodes():
+        return 1
+
+    def resolve_nodes():
+        return 2
 
     # What does a BLOCK look like?
     # --> Each block has an index, a timestamp, list of transactions, a proof,
-        # hash of previous block(gives the immutability factor)
+        # and hash of previous block(which gives us the immutability factor)
         # block = {
         # 'index': 1,
         # 'timestamp': 1506057125.900785, --> in unix
@@ -32,11 +40,9 @@ class BlockChain(object):
         # ],
         # 'proof': 324984774000, --> I am guessing this is the so called "nonce" --> related to mining/and validity-->proof of work
         # 'previous_hash': "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
-        #  what about the current hash?
         # }
 
     # create a block and add to chain, returns the block(dictionary)
-
     def add_block(self, proof, previous_hash=None):
 
         block = {
@@ -54,18 +60,14 @@ class BlockChain(object):
         return block
 
     # hashes the whole block
-
     @staticmethod
     def hasher(block):
-
         # converts block to string, and orders the dictionary, or it'll introduce inconsistent hashes
         blockInString = json.dumps(block, sort_keys=True).encode()
-
         # Creates a SHA-256 hash of a Block
         return hashlib.sha256(blockInString).hexdigest()
 
     def add_transaction(self, sender, recipient, amount):
-
         self.transactions.append(
             {
                 'sender': sender,
@@ -73,12 +75,10 @@ class BlockChain(object):
                 'amount': amount,
             }
         )
-
         # returns the index of the block(the next one to be mined) that holds this transaction
         return self.latest_block['index'] + 1
 
     # returns the last block in the chain
-
     @property
     def latest_block(self):
         return self.chain[-1]
@@ -87,23 +87,23 @@ class BlockChain(object):
     # the number which would solve a problem. Computationally, this number should be difficult to find, but easy to verify
     # by the network.
 
-    # In general, the difficulty is determined by the number of characters searched for in a string.
+        # In general, the difficulty is determined by the number of characters searched for in a string.
+        # --> EXAMPLE:
+        # --> In this case, we decided that the multiplication of hashed x and y should end with 0
+        # x = 5
+        # y = 0  # We don't know what y should be
 
-    # --> in this case, we decided that the multiplication of hashed x and y should end with 0
-    # x = 5
-    # y = 0  # We don't know what y should be
-
-    # so while the multiplication of the hashed values does not return a value of 0 at  index[-1] (the last character) , then increment
-    # while sha256(f'{x*y}'.encode()).hexdigest()[-1] != "0":
-    #     y += 1
-    # print(f'The solution is y = {y}')
+        # while sha256(f'{x*y}'.encode()).hexdigest()[-1] != "0":
+        #     y += 1
+        # print(f'The solution is y = {y}')
 
     # Algorithm
     # Find a number p' such that hash(pp') contains leading 4 0s, where p is the previous p'
     # p is the previous proof, and p' is the new proof
-
     def proof_of_work(self, last_proof):
         proof = 0
+        # so while the multiplication of the hashed values does not return a value of 0 at index[-1] (the last character) ,
+        # then increment
         while self.proofing(last_proof, proof) is False:
             proof += 1
         return proof
@@ -111,7 +111,6 @@ class BlockChain(object):
     @staticmethod
     # returns: <bool> True if correct, False if not.
     def proofing(last_proof, proof):
-
         guess = f'{last_proof}{proof}'.encode()
         guessHashed = hashlib.sha256(guess).hexdigest()
 
